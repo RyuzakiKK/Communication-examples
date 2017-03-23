@@ -1,6 +1,17 @@
 # Communication-examples
 Simple bluetooth and wormhole python implementation
 
+## Bluetooth with GUI
+Requires Python 3, and with minor fixes will also works with Python 2
+This program uses the library `pybluez`.
+
+This is an example of sending a message
+
+![Sending](https://i.imgur.com/NMEd5z1.gif)
+
+And this is an example of the receive
+
+![Receiving](http://imgur.com/GGrxzOM.gif)
 
 ## Bluetooth
 Requires Python 3.3+
