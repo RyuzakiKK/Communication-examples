@@ -15,7 +15,7 @@ def _got(inbound_message):
 w1 = wormhole(u"ryuzaki", RENDEZVOUS_RELAY, reactor)
 
 if args.code:
-    w1.set_code(unicode(args.code, 'utf-8'))
+    w1.set_code(args.code)
 else:
     w1.set_code(u'4-cannonball-tux')
 

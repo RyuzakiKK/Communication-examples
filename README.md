@@ -18,6 +18,18 @@ Requires Python 3.3+
 
 Execute `bluetooth_server.py` in one device and then `bluetooth_client.py` in another device.
 
+
+## Magic Wormhole GUI
+Requires Python 3, and with minor fixes will also works with Python 2
+
+Requires wormhole `$ pip install magic-wormhole`
+
+To start utilize it simply execute `worm_messages.py`
+
+This is an example of usage
+
+![wormhole utilization](http://imgur.com/XFaRPuy.gif)
+
 ## Magic Wormhole
 Can be used either with Python 2 or 3
 
