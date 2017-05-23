@@ -24,6 +24,9 @@ class GUI:
         self.notebook.prepend_page(sp2, Gtk.Label("Send"))
         sp2.hide()
 
+        text_buffer = self.builder.get_object("code_to_send").get_buffer()
+        text_buffer.connect('changed', self.on_code_text_changed)
+
         # Start the reactor in another thread
         t = threading.Thread(target=reactor.run, kwargs={'installSignalHandlers': 0})
         t.start()
@@ -32,6 +35,14 @@ class GUI:
     def on_delete_window(*args):
         reactor.callFromThread(reactor.stop)
         Gtk.main_quit(*args)
+
+    def on_code_text_changed(self, entryObject, *args):
+        send_button = self.builder.get_object("send_button")
+        # Check if the code field is not empty
+        if len(entryObject.get_text(*entryObject.get_bounds(), False)) > 0:
+            send_button.set_sensitive(True)
+        else:
+            send_button.set_sensitive(False)
 
     def on_send_pressed(self, button):
         # Hide the panel 1 and display the panel 2
@@ -44,7 +55,7 @@ class GUI:
         text_buffer = self.builder.get_object("code_to_send").get_buffer()
 
         # text_buffer.get_bounds() means "get the entire message"
-        code = text_buffer.get_text(*text_buffer.get_bounds(), False)  # TODO check if empty
+        code = text_buffer.get_text(*text_buffer.get_bounds(), False)
         text_buffer = self.builder.get_object("text_to_send").get_buffer()
         message = text_buffer.get_text(*text_buffer.get_bounds(), False)
         if message == "":
