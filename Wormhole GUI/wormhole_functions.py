@@ -1,6 +1,6 @@
 from twisted.internet import reactor
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
-from wormhole.wormhole import wormhole
+import wormhole
 import gi
 import logging
 gi.require_version('Gtk', '3.0')
@@ -16,16 +16,19 @@ w1 = None
 
 def send(code, message, callback):
     global w2
-    logging.info("Sending a message")
+    logger.info("Sending a message")
 
-    w2 = wormhole(u"wormgui", RENDEZVOUS_RELAY, reactor)
+    w2 = wormhole.create(u"wormgui", RENDEZVOUS_RELAY, reactor)
     w2.set_code(code)
-    w2.send(str.encode(message))
+    w2.send_message(str.encode(message))
 
-    # wait for the reply
-    d = w2.get()
-    d.addCallback(lambda _: GObject.idle_add(callback, True))
-    d.addCallback(w2.close)
+    # wait for reply
+    def received(msg):
+        logger.info("Got data, %d bytes" % len(msg))
+        GObject.idle_add(callback, True)
+        w2.close()
+
+    w2.get_message().addCallback(received)
 
 
 def stop_sending(callback):
@@ -38,24 +41,31 @@ def stop_sending(callback):
 
 def start_receive(callback1, callback2):
     global w1
-    w1 = wormhole(u"wormgui", RENDEZVOUS_RELAY, reactor)
+    w1 = wormhole.create(u"wormgui", RENDEZVOUS_RELAY, reactor)
+    w1.allocate_code()
 
-    d = w1.get_code()
-    d.addCallback(lambda c: _got_code(c, callback1))
-    d.addCallback(lambda _: w1.get())
-    d.addCallback(lambda m: _got_message(m, callback2))
-    d.addCallback(w1.close)
+    def write_code(code):
+        logger.info("code: %s" % code)
+        _got_code(code, callback1)
+
+    w1.get_code().addCallback(write_code)
+
+    def received(msg):
+        logger.info("got data, %d bytes" % len(msg))
+        _got_message(msg, callback2)
+
+    w1.get_message().addCallback(received)
 
 
 def _got_code(code, callback):
     global w1
-    logging.info("Invitation Code:", code)
+    logger.info("Invitation Code:", code)
     GObject.idle_add(callback, code)
-    return w1.send(b"outbound data")
+    return w1.send_message(b"outbound data")
 
 
 def _got_message(message, callback):
-    logging.info("Message received:", message)
+    logger.info("Message received:", message)
     GObject.idle_add(callback, message)
 
 

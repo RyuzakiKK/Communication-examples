@@ -6,9 +6,7 @@ import threading
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
 
-
 logger = logging.getLogger(__name__)
-
 
 class GUI:
 
@@ -66,13 +64,13 @@ class GUI:
 
         worm.send(code, message, self.on_message_callback)
 
-    def on_stop_send_clicked(self):
+    def on_stop_send_clicked(self, button):
         worm.stop_sending(self.on_stop_send_callback)
 
     def on_stop_send_callback(self):
         finish_label = self.builder.get_object("finish_label")
         finish_label.set_text("Sending cancelled")
-        finish_button = self.builder.get_object("finish_button")
+        finish_button = self.builder.get_object("finish_send_button")
         finish_button.set_sensitive(True)
         stop_button = self.builder.get_object("stop_send_button")
         stop_button.set_sensitive(False)
