@@ -20,11 +20,12 @@ Execute `bluetooth_server.py` in one device and then `bluetooth_client.py` in an
 
 
 ## Magic Wormhole GUI
-Requires Python 3, and with minor fixes will also works with Python 2
-
+Requires Python 3, and with minor fixes will also works with Python 2.
 Requires the latest git version of Magic Wormhole.
 
 In Arch Linux it can be installed with the AUR package `magic-wormhole-git`.
+
+If you want to use the latests stable version of Magic Wormhole, switch to the branch `0.9.2`.
 
 To start utilize it simply execute `$ python3 worm_messages.py`
 
