@@ -4,7 +4,7 @@ import wormhole
 import gi
 import logging
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject
+from gi.repository import GLib
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def send(code, message, callback):
     # wait for reply
     def received(msg):
         logger.info("Got data, %d bytes" % len(msg))
-        GObject.idle_add(callback, True)
+        GLib.idle_add(callback, True)
         w2.close()
 
     w2.get_message().addCallback(received)
@@ -36,7 +36,7 @@ def stop_sending(callback):
     if w2 is not None:
         w2.close()
 
-    GObject.idle_add(callback)
+    GLib.idle_add(callback)
 
 
 def start_receive(callback1, callback2):
@@ -60,13 +60,13 @@ def start_receive(callback1, callback2):
 def _got_code(code, callback):
     global w1
     logger.info("Invitation Code:", code)
-    GObject.idle_add(callback, code)
+    GLib.idle_add(callback, code)
     return w1.send_message(b"outbound data")
 
 
 def _got_message(message, callback):
     logger.info("Message received:", message)
-    GObject.idle_add(callback, message)
+    GLib.idle_add(callback, message)
 
 
 def stop_receiving(callback):
@@ -74,4 +74,4 @@ def stop_receiving(callback):
     if w1 is not None:
         w1.close()
 
-    GObject.idle_add(callback)
+    GLib.idle_add(callback)
