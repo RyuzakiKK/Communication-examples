@@ -1,10 +1,14 @@
 import gi
-import wormhole_functions as worm
-import logging
-from twisted.internet import reactor
-import threading
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
+import logging
+
+# All reactor parts should be checked for correctness
+from twisted.internet import gtk3reactor
+gtk3reactor.install()
+
+from twisted.internet import reactor
+import wormhole_functions as worm
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +29,7 @@ class GUI:
         text_buffer = self.builder.get_object("code_to_send").get_buffer()
         text_buffer.connect('changed', self.on_code_text_changed)
 
-        # Start the reactor in another thread
-        t = threading.Thread(target=reactor.run, kwargs={'installSignalHandlers': 0})
-        t.start()
+        reactor.run()
 
     @staticmethod
     def on_delete_window(*args):
