@@ -31,7 +31,7 @@ To start utilize it simply execute `$ python3 worm_messages.py`
 
 This is an example of usage
 
-![wormhole utilization](http://imgur.com/XFaRPuy.gif)
+![wormhole utilization](https://i.imgur.com/WqZ2aOz.gif)
 
 ## Magic Wormhole
 Can be used either with Python 2 or 3
