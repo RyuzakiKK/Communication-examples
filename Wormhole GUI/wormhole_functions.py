@@ -14,18 +14,24 @@ w2 = None
 w1 = None
 
 
-def send(code, message, callback):
+def send(message, callback1, callback2):
     global w2
     logger.info("Sending a message")
 
     w2 = wormhole.create(u"wormgui", RENDEZVOUS_RELAY, reactor)
-    w2.set_code(code)
+    w2.allocate_code()
+
+    def write_code(code):
+        logger.info("Invitation Code:", code)
+        GLib.idle_add(callback1, code)
+
+    w2.get_code().addCallback(write_code)
     w2.send_message(str.encode(message))
 
     # wait for reply
     def received(msg):
         logger.info("Got data, %d bytes" % len(msg))
-        GLib.idle_add(callback, True)
+        GLib.idle_add(callback2, True)
         w2.close()
 
     w2.get_message().addCallback(received)
@@ -39,34 +45,17 @@ def stop_sending(callback):
     GLib.idle_add(callback)
 
 
-def start_receive(callback1, callback2):
+def start_receive(code, callback):
     global w1
     w1 = wormhole.create(u"wormgui", RENDEZVOUS_RELAY, reactor)
-    w1.allocate_code()
+    w1.set_code(code)
 
-    def write_code(code):
-        logger.info("code: %s" % code)
-        _got_code(code, callback1)
-
-    w1.get_code().addCallback(write_code)
-
-    def received(msg):
-        logger.info("got data, %d bytes" % len(msg))
-        _got_message(msg, callback2)
+    def received(message):
+        logger.info("Message received:", message)
+        GLib.idle_add(callback, message)
+        return w1.send_message(b"outbound data")
 
     w1.get_message().addCallback(received)
-
-
-def _got_code(code, callback):
-    global w1
-    logger.info("Invitation Code:", code)
-    GLib.idle_add(callback, code)
-    return w1.send_message(b"outbound data")
-
-
-def _got_message(message, callback):
-    logger.info("Message received:", message)
-    GLib.idle_add(callback, message)
 
 
 def stop_receiving(callback):
