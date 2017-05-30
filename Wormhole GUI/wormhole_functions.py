@@ -22,7 +22,7 @@ def send(message, callback1, callback2):
     w2.allocate_code()
 
     def write_code(code):
-        logger.info("Invitation Code:", code)
+        logger.info("Invitation Code {}".format(code))
         GLib.idle_add(callback1, code)
 
     w2.get_code().addCallback(write_code)
@@ -51,7 +51,7 @@ def start_receive(code, callback):
     w1.set_code(code)
 
     def received(message):
-        logger.info("Message received:", message)
+        logger.info("Message received: {}".format(message))
         GLib.idle_add(callback, message)
         return w1.send_message(b"outbound data")
 
