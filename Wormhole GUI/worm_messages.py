@@ -110,7 +110,7 @@ class GUI:
         status_label = self.builder.get_object("receive_status")
         status_label.set_label("Message received:")
         received_text = self.builder.get_object("received_text")
-        received_text.set_label(message.decode("utf-8"))
+        received_text.set_label(message)
         finish_button = self.builder.get_object("finish_button_2")
         finish_button.set_sensitive(True)
 
@@ -140,6 +140,3 @@ class GUI:
 
 GUI()
 Gtk.main()
-
-
-

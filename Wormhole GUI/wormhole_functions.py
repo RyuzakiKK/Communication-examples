@@ -3,6 +3,7 @@ from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
 import gi
 import logging
+import json
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
 
@@ -12,13 +13,14 @@ server_socket = None
 
 w2 = None
 w1 = None
+# the following id is needed for interoperability with wormhole cli
+app_id = u"lothar.com/wormhole/text-or-file-xfer"
 
 
 def send(message, callback1, callback2):
     global w2
     logger.info("Sending a message")
-
-    w2 = wormhole.create(u"wormgui", RENDEZVOUS_RELAY, reactor)
+    w2 = wormhole.create(app_id, RENDEZVOUS_RELAY, reactor)
     w2.allocate_code()
 
     def write_code(code):
@@ -26,7 +28,11 @@ def send(message, callback1, callback2):
         GLib.idle_add(callback1, code)
 
     w2.get_code().addCallback(write_code)
-    w2.send_message(str.encode(message))
+
+    offer = {"message": message}
+    data = {"offer": offer}
+    m = _encode_message(data)
+    w2.send_message(m)
 
     # wait for reply
     def received(msg):
@@ -47,13 +53,19 @@ def stop_sending(callback):
 
 def start_receive(code, callback):
     global w1
-    w1 = wormhole.create(u"wormgui", RENDEZVOUS_RELAY, reactor)
+    w1 = wormhole.create(app_id, RENDEZVOUS_RELAY, reactor)
     w1.set_code(code)
 
     def received(message):
-        logger.info("Message received: {}".format(message))
-        GLib.idle_add(callback, message)
-        return w1.send_message(b"outbound data")
+        m = _decode_message(message)
+        text = m["offer"]["message"]
+        logger.info("Message received: {}".format(text))
+        GLib.idle_add(callback, text)
+
+        # send a reply with a message ack
+        reply = {"answer": {"message_ack": "ok"}}
+        reply_encoded = _encode_message(reply)
+        return w1.send_message(reply_encoded)
 
     w1.get_message().addCallback(received)
 
@@ -64,3 +76,11 @@ def stop_receiving(callback):
         w1.close()
 
     GLib.idle_add(callback)
+
+
+def _encode_message(message):
+    return json.dumps(message).encode("utf-8")
+
+
+def _decode_message(message):
+    return json.loads(message.decode("utf-8"))
