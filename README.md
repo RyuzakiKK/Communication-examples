@@ -33,6 +33,10 @@ This is an example of usage
 
 ![wormhole utilization](https://i.imgur.com/WqZ2aOz.gif)
 
+This program is interoperable with the cli official version of Magic Wormhole.
+
+![wormhole interoperability](https://i.imgur.com/xAGoRMC.gif)
+
 ## Magic Wormhole
 Can be used either with Python 2 or 3
 
